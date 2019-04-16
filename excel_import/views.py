@@ -12,10 +12,11 @@ from django.db import transaction
 from excel_import import forms
 import logging
 
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.ERROR,
                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
-                    datefmt=' %Y-%m-%d %H:%M:%S')
-
+                    datefmt=' %Y-%m-%d %H:%M:%S',
+                    filename='bug.log', filemode='a',
+                    )
 # Create your views here.
 HEADER_LINE = 3  # excel表 表头从第几行开始,以excel行数为标准
 START_LINE = 4  # excel表 有效数据从第几行开始,以excel行数为标准
@@ -81,7 +82,9 @@ class Read_sheet(views.View):
                 ret = {'code': 0, 'msg': [{'文件错误': ['文件为空']}]}
             return render(request, 'import_excel.html', {'ret': ret})
         except Exception as e:
+            logging.error(e)
             return render(request, 'import_excel.html', {'ret': {'code': 0, 'msg': [{'服务器错误': ['服务器发生了未知的错误']}]}})
+
 
 
 class Save_xlsx(views.View):
@@ -107,6 +110,7 @@ class Save_xlsx(views.View):
                     error_msg.append(ret)
             return render(request, 'save_excel.html', {'error_msg': error_msg})
         except Exception as e:
+            logging.ERROR(e)
             redirect('/')
 
 

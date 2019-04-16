@@ -1,0 +1,8 @@
+ 2019-04-16 17:46:52 views.py[line:241] ERROR '趋势图数据'
+ 2019-04-16 17:46:52 views.py[line:241] ERROR 表格出现异常,执行回滚
+ 2019-04-16 17:46:52 views.py[line:241] ERROR 表格出现异常,执行回滚
+ 2019-04-16 17:46:52 views.py[line:241] ERROR 表格出现异常,执行回滚
+ 2019-04-16 17:46:52 views.py[line:241] ERROR 表格出现异常,执行回滚
+ 2019-04-16 17:46:52 views.py[line:241] ERROR '计划'
+ 2019-04-16 17:46:52 views.py[line:241] ERROR Invalid field name(s) for model BxEverydayData: 'end_time', 'pic_count', 'pic_time_gap', 'start_time', 'station_name', 'status'.
+ 2019-04-16 17:46:52 views.py[line:241] ERROR 表格出现异常,执行回滚
