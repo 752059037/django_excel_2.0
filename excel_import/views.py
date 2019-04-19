@@ -68,36 +68,13 @@ class Save_xlsx(views.View):
             t_list = []
             for i in sheet_name:
                 xlsx_iter = xlsx_obj.read_data(i)
-                t = GetThreadRet(xlsx_obj.verity_save_xlsx, args=(xlsx_iter,))
-                t_list.append(t)
-                t.start()  # 开启多线程校验保存数据
-            for t in t_list:
-                t.join()
-                ret = t.get_result()
+                ret = xlsx_obj.verity_save_xlsx(xlsx_iter,)
                 if ret['code'] == 0:
                     error_msg.append(ret)
             return render(request, 'save_excel.html', {'error_msg': error_msg})
         except Exception as e:
             logging.ERROR(e)
             return render(request, 'save_excel.html', {'error_msg': error_msg})
-
-
-# 此类只是为了获取线程的返回值
-class GetThreadRet(Thread):
-    def __init__(self, func, args=()):
-        super(GetThreadRet, self).__init__()
-        self.func = func
-        self.args = args
-    
-    def run(self):
-        self.result = self.func(*self.args)
-    
-    def get_result(self):
-        try:
-            return self.result
-        except Exception:
-            return None
-
 
 class Operation_xlsx:
     """
