@@ -20,13 +20,14 @@ logging.basicConfig(level=logging.ERROR,
 # Create your views here.
 
 
-created_ok = []
+
 
 SHEET_TO_TABLE = settings.SHEET_TO_TABLE
 HEADER_LINE = settings.HEADER_LINE
 START_LINE = settings.START_LINE
 EXCEL_EXPORT_PATH = settings.EXCEL_EXPORT_PATH
 UNIQUE = settings.UNIQUE
+SHEET_BLACKLIST = settings.SHEET_BLACKLIST
 
 
 class Read_sheet(views.View):
@@ -64,8 +65,6 @@ class Save_xlsx(views.View):
         error_msg = []
         try:
             sheet_name = request.POST.getlist('sheet_name')  # 取到要保存的sheet名
-            
-            # print('sheet_name: ', sheet_name)
             t_list = []
             for i in sheet_name:
                 xlsx_iter = xlsx_obj.read_data(i)
@@ -130,6 +129,7 @@ class Operation_xlsx:
             row_type = sheet.row_types(i)
             data = sheet.row_values(i)
             for index, cell_type_num in enumerate(row_type, 0):
+                
                 if cell_type_num == 3:  # 将Excel时间类型转化为datetime类型
                     data[index] = datetime.datetime(*xldate_as_tuple(sheet.row_values(i)[index], 0))
                 elif cell_type_num == 2:  # 找到number类型,转化为int类型
@@ -143,6 +143,8 @@ class Operation_xlsx:
         """
         sheet_list = []
         for sheet in self.data.sheets():
+            if sheet.name in SHEET_BLACKLIST: # 不导入的表就不展示
+                continue
             if sheet.visibility == 0:
                 sheet_list.append(sheet.name)
         return sheet_list
@@ -201,19 +203,22 @@ class Operation_xlsx:
                                 **unique_field,
                                 defaults=clean_data
                             )
+                            
                         else:
                             error_data, error_msg = list(form_obj.errors.items())[0]
+                            
                             ret['msg'].append({'{}页 第{}行,{}'.format(sheet_name, line_num, error_data, ): error_msg})
                 if ret['msg']:
                     ret['code'] = 0
-                    created_ok.pop(sheet_name)
                     raise ValueError('表格出现异常,执行回滚')
         except ValueError as ve:
             logging.info(ve)
+        except KeyError as ke:
+            ret['msg'].append({sheet_name: ['此页无对应的数据表', ]})
+            logging.info(ke)
         except Exception as e:
             ret['msg'].append({sheet_name: ['表格格式错误', ]})
             logging.error(e)
-            
             # raise e
         
         return ret
@@ -222,23 +227,23 @@ class Operation_xlsx:
 class Excel_export(views.View):
     
     def get(self, request):
-        sheet_name = request.GET.get('sheet_name')
         ret = {'code': None, 'sheet_name_list': []}
-        if not sheet_name:
-            for i in dir(models):
-                if i.startswith('Bx'):
-                    model = getattr(models, i)
-                    obj = model.objects.first()
-                    if obj:
-                        ret['sheet_name_list'].append(obj._meta.verbose_name)
-                        ret['last_url'] = '/'
-        else:
-            try:
+        try:
+            sheet_name = request.GET.get('sheet_name')
+            if not sheet_name:
+                for i in dir(models):
+                    if i.startswith('Bx'):
+                        model = getattr(models, i)
+                        obj = model.objects.first()
+                        if obj:
+                            ret['sheet_name_list'].append(obj._meta.verbose_name)
+                            ret['last_url'] = '/'
+            else:
                 workbook = xlwt.Workbook(encoding='utf-8')
                 sheet = workbook.add_sheet(sheet_name, cell_overwrite_ok=True)
                 model_name = SHEET_TO_TABLE[sheet_name][0]
                 model = getattr(models, model_name)
-                
+
                 field = model.objects.first()
                 if field:
                     field = field._meta.fields  # 取到模型的所有字段
@@ -264,9 +269,9 @@ class Excel_export(views.View):
                             sheet.write(i, j, col, )
                 workbook.save('{}/{}.xls'.format(EXCEL_EXPORT_PATH, sheet_name))
                 ret['code'] = 1
-            except Exception as e:
-                ret['code'] = 0
-                logging.error(e)
+        except Exception as e:
+            ret['code'] = 0
+            logging.error(e)
         return render(request, 'export_excel.html', {'ret': ret})
 
 

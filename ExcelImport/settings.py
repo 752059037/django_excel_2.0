@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'ExcelImport.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django_excel_import',
+        'NAME': 'excel_django',
         'HOST': '127.0.0.1',
         'PORT': 3306,
         'USER': 'ROOT',
@@ -123,8 +123,10 @@ STATIC_URL = '/static/'
 
 EXCEL_EXPORT_PATH = "C:/"  # excel导出的路径
 
-HEADER_LINE = 3  # excel表 表头从第几行开始,以excel行数为标准
-START_LINE = 4  # excel表 有效数据从第几行开始,以excel行数为标准
+HEADER_LINE = 2  # excel表 表头从第几行开始,以excel行数为标准
+START_LINE = 3  # excel表 有效数据从第几行开始,以excel行数为标准
+
+SHEET_BLACKLIST = ['环比数据表', ]  # 不导入的表
 
 # Sheet名 与 Model名 Form表单名的对应关系
 # {'sheet名':[Model名, Form名]}
@@ -140,7 +142,6 @@ SHEET_TO_TABLE = {
     '演艺时间': ['BxPerformArrange', 'BxPerformArrangeForm'],
 }
 
-
 # 各个表的唯一字段对应(多个字段联合唯一)
 UNIQUE = {
     'BxStationDetail': ['station_id'],
@@ -149,7 +150,7 @@ UNIQUE = {
     'BxDevice': ['station_id', 'device_id'],
     'BxContrast': ['station_id', 'contrast_id'],
     'BxEverydayData': ['station_id', 'date'],
-    'BxEverydayContrastData': ['brand_id', 'name', 'grade'],
+    # 'BxEverydayContrastData': ['parent_id', ],
     'BxText': ['brand_id', 'dashboard_id', ],
     'BxPerformArrange': ['station_id', 'station_name', 'start_time', 'end_time'],
 }
