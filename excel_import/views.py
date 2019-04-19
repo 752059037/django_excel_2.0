@@ -212,6 +212,7 @@ class Excel_export(views.View):
                         if obj:
                             ret['sheet_name_list'].append(obj._meta.verbose_name)
                             ret['last_url'] = '/'
+                return render(request, 'export_excel.html', {'ret': ret})
             else:
                 workbook = xlwt.Workbook(encoding='utf-8')
                 sheet = workbook.add_sheet(sheet_name, cell_overwrite_ok=True)
@@ -243,10 +244,16 @@ class Excel_export(views.View):
                             sheet.write(i, j, col, )
                 workbook.save('{}/{}.xls'.format(EXCEL_EXPORT_PATH, sheet_name))
                 ret['code'] = 1
+                from django.http import FileResponse
+                file = open('{}/{}.xls'.format(EXCEL_EXPORT_PATH, sheet_name), 'rb')
+                response = FileResponse(file)
+                response['Content-Type'] = 'application/octet-stream'
+                response['Content-Disposition'] = 'attachment;filename="{}.xls"'.format(SHEET_TO_TABLE[sheet_name][0])
+                return response
         except Exception as e:
             ret['code'] = 0
             logging.error(e)
-        return render(request, 'export_excel.html', {'ret': ret})
+            return render(request, 'export_excel.html', {'ret': ret})
 
 
 class Index(views.View):
