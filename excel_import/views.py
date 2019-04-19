@@ -73,7 +73,7 @@ class Save_xlsx(views.View):
                     error_msg.append(ret)
             return render(request, 'save_excel.html', {'error_msg': error_msg})
         except Exception as e:
-            logging.ERROR(e)
+            logging.error(e)
             return render(request, 'save_excel.html', {'error_msg': error_msg})
 
 class Operation_xlsx:
@@ -106,11 +106,8 @@ class Operation_xlsx:
             row_type = sheet.row_types(i)
             data = sheet.row_values(i)
             for index, cell_type_num in enumerate(row_type, 0):
-                
                 if cell_type_num == 3:  # 将Excel时间类型转化为datetime类型
                     data[index] = datetime.datetime(*xldate_as_tuple(sheet.row_values(i)[index], 0))
-                elif cell_type_num == 2:  # 找到number类型,转化为int类型
-                    data[index] = int(sheet.row_values(i)[index])
             yield_data = {'sheet_name': sheet.name, 'line_num': i + 1, 'content': data}
             yield yield_data
     

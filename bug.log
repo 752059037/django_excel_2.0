@@ -1,0 +1,60 @@
+ 2019-04-19 17:09:09 views.py[line:202] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:09:09 views.py[line:202] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:09:09 views.py[line:202] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:09:09 views.py[line:202] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:09:09 views.py[line:202] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:09:09 views.py[line:202] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:09:09 views.py[line:202] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:09:09 views.py[line:202] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:11:09 exception.py[line:135] ERROR Internal Server Error: /save_xlsx/
+Traceback (most recent call last):
+  File "E:\BrandMax\ExcelImport\excel_import\views.py", line 70, in post
+    xlsx_iter = xlsx_obj.read_data(i)
+NameError: name 'xlsx_obj' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\BrandMax\lib\site-packages\django\core\handlers\exception.py", line 41, in inner
+    response = get_response(request)
+  File "E:\BrandMax\lib\site-packages\django\core\handlers\base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "E:\BrandMax\lib\site-packages\django\core\handlers\base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "E:\BrandMax\lib\site-packages\django\views\generic\base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "E:\BrandMax\lib\site-packages\django\views\generic\base.py", line 88, in dispatch
+    return handler(request, *args, **kwargs)
+  File "E:\BrandMax\ExcelImport\excel_import\views.py", line 76, in post
+    logging.ERROR(e)
+TypeError: 'int' object is not callable
+ 2019-04-19 17:12:47 views.py[line:202] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:12:47 views.py[line:202] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:12:47 views.py[line:202] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:12:47 views.py[line:202] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:12:47 views.py[line:202] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:12:47 views.py[line:202] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:12:47 views.py[line:202] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:12:47 views.py[line:202] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:17:47 views.py[line:76] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:18:47 views.py[line:76] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:18:50 views.py[line:76] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:19:11 views.py[line:76] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:19:25 views.py[line:76] ERROR 'float' object does not support item assignment
+ 2019-04-19 17:21:23 exception.py[line:135] ERROR Internal Server Error: /save_xlsx/
+Traceback (most recent call last):
+  File "E:\BrandMax\lib\site-packages\django\core\handlers\exception.py", line 41, in inner
+    response = get_response(request)
+  File "E:\BrandMax\lib\site-packages\django\core\handlers\base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "E:\BrandMax\lib\site-packages\django\core\handlers\base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "E:\BrandMax\lib\site-packages\django\views\generic\base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "E:\BrandMax\lib\site-packages\django\views\generic\base.py", line 88, in dispatch
+    return handler(request, *args, **kwargs)
+  File "E:\BrandMax\ExcelImport\excel_import\views.py", line 77, in post
+    raise e
+  File "E:\BrandMax\ExcelImport\excel_import\views.py", line 70, in post
+    xlsx_iter = xlsx_obj.read_data(i)
+NameError: name 'xlsx_obj' is not defined
