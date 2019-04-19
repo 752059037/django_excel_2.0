@@ -118,3 +118,38 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+#######################配置文件#####################
+
+EXCEL_EXPORT_PATH = "C:/"  # excel导出的路径
+
+HEADER_LINE = 3  # excel表 表头从第几行开始,以excel行数为标准
+START_LINE = 4  # excel表 有效数据从第几行开始,以excel行数为标准
+
+# Sheet名 与 Model名 Form表单名的对应关系
+# {'sheet名':[Model名, Form名]}
+SHEET_TO_TABLE = {
+    '站点信息表': ['BxStationDetail', 'BxStationDetailForm'],
+    '直播配置': ['BxLiveUrl', 'BxLiveUrlForm'],
+    '车型热度表': ['BxRoiTraffic', 'BxRoiTrafficForm'],
+    '站点设备信息表': ['BxDevice', 'BxDeviceForm'],
+    '竞品关联表': ['BxContrast', 'BxContrastForm'],
+    '站点数据表': ['BxEverydayData', 'BxEverydayDataForm'],
+    '环比数据表': ['BxEverydayContrastData', 'BxEverydayContrastDataForm'],
+    '文本': ['BxText', 'BxTextForm'],
+    '演艺时间': ['BxPerformArrange', 'BxPerformArrangeForm'],
+}
+
+
+# 各个表的唯一字段对应(多个字段联合唯一)
+UNIQUE = {
+    'BxStationDetail': ['station_id'],
+    'BxLiveUrl': ['station_id', ],
+    'BxRoiTraffic': ['station_id', 'roi_id', 'date'],
+    'BxDevice': ['station_id', 'device_id'],
+    'BxContrast': ['station_id', 'contrast_id'],
+    'BxEverydayData': ['station_id', 'date'],
+    'BxEverydayContrastData': ['brand_id', 'name', 'grade'],
+    'BxText': ['brand_id', 'dashboard_id', ],
+    'BxPerformArrange': ['station_id', 'station_name', 'start_time', 'end_time'],
+}

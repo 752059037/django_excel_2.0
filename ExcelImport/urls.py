@@ -20,5 +20,7 @@ from  excel_import import views
 urlpatterns = [
     url('admin/', admin.site.urls),
     url('save_xlsx', views.Save_xlsx.as_view()),
-    url('', views.Read_sheet.as_view()),
+    url('export_excel', views.Excel_export.as_view()),
+    url('import_excel', views.Read_sheet.as_view()),
+    url('', views.Index.as_view()),
 ]

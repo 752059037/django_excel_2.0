@@ -13,6 +13,7 @@ class BxContrast(models.Model):
     class Meta:
         managed = True
         db_table = 'bx_contrast'
+        verbose_name = '竞品关联表'
 
 
 class BxDevice(models.Model):
@@ -25,6 +26,7 @@ class BxDevice(models.Model):
     class Meta:
         managed = True
         db_table = 'bx_device'
+        verbose_name = '站点设备信息表'
 
 
 class BxEverydayContrastData(models.Model):
@@ -46,6 +48,7 @@ class BxEverydayContrastData(models.Model):
     class Meta:
         managed = True
         db_table = 'bx_everyday_contrast_data'
+        verbose_name = '环比数据表'
 
 
 class BxEverydayData(models.Model):
@@ -64,6 +67,7 @@ class BxEverydayData(models.Model):
     class Meta:
         managed = True
         db_table = 'bx_everyday_data'
+        verbose_name = '站点数据表'
 
 
 class BxLiveUrl(models.Model):
@@ -76,6 +80,7 @@ class BxLiveUrl(models.Model):
     class Meta:
         managed = True
         db_table = 'bx_live_url'
+        verbose_name = '直播配置'
 
 
 class BxPerformArrange(models.Model):
@@ -92,6 +97,7 @@ class BxPerformArrange(models.Model):
     class Meta:
         managed = True
         db_table = 'bx_perform_arrange'
+        verbose_name = '演艺时间'
 
 
 class BxRoiTraffic(models.Model):
@@ -108,6 +114,7 @@ class BxRoiTraffic(models.Model):
     class Meta:
         managed = True
         db_table = 'bx_roi_traffic'
+        verbose_name = '车型热度表'
 
 
 class BxStationDetail(models.Model):
@@ -135,6 +142,7 @@ class BxStationDetail(models.Model):
     class Meta:
         managed = True
         db_table = 'bx_station_detail'
+        verbose_name = '站点信息表'
 
 
 class BxText(models.Model):
@@ -148,3 +156,4 @@ class BxText(models.Model):
     class Meta:
         managed = True
         db_table = 'bx_text'
+        verbose_name = '文本'

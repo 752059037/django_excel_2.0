@@ -1,9 +1,6 @@
 from django.shortcuts import render, redirect
 from threading import Thread
-
-# Create your views here.
-from datetime import datetime
-from django.shortcuts import render
+import datetime
 from django import views
 import xlrd
 from xlrd import xldate_as_tuple
@@ -11,54 +8,25 @@ from excel_import import models
 from django.db import transaction
 from excel_import import forms
 import logging
+import xlwt
+from django.conf import settings
 
 logging.basicConfig(level=logging.ERROR,
                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                     datefmt=' %Y-%m-%d %H:%M:%S',
                     filename='bug.log', filemode='a',
                     )
+
 # Create your views here.
-HEADER_LINE = 3  # excel表 表头从第几行开始,以excel行数为标准
-START_LINE = 4  # excel表 有效数据从第几行开始,以excel行数为标准
-
-# Sheet名 与 Model名 Form表单名的对应关系
-# {'sheet名':[Model名, Form名]}
-SHEET_TO_TABLE = {
-    '站点信息表': ['BxStationDetail', 'BxStationDetailForm'],
-    '直播配置': ['BxLiveUrl', 'BxLiveUrlForm'],
-    '车型热度表': ['BxRoiTraffic', 'BxRoiTrafficForm'],
-    '站点设备信息表': ['BxDevice', 'BxDeviceForm'],
-    '竞品关联表': ['BxContrast', 'BxContrastForm'],
-    '站点数据表': ['BxEverydayData', 'BxEverydayDataForm'],
-    '环比数据表': ['BxEverydayContrastData', 'BxEverydayContrastDataForm'],
-    '文本': ['BxText', 'BxTextForm'],
-    '演艺时间': ['BxPerformArrange', 'BxPerformArrangeForm'],
-}
-
-# UNIQUE = {
-#     'BxStationDetail': ['station_id'],
-#     'BxLiveUrl': ['station_id', ],
-#     'BxRoiTraffic': ['station_id', 'roi_id', 'date'],
-#     'BxDevice': ['station_id', 'device_id'],
-#     'BxContrast': ['station_id', 'contrast_id'],
-#     'BxEverydayData': ['station_id', 'date'],
-#     'BxEverydayContrastData': ['brand', 'start_date', 'name', 'grade_id'],
-#     'BxText': ['brand', 'dashboard_name', 'dashboard_id ', 'station_id'],
-#     'BxPerformArrange': ['station_id', 'station_name', 'start_time', 'end_time'],
-# }
 
 
-UNIQUE = {
-    'BxStationDetail': ['station_id'],
-    'BxLiveUrl': ['station_id', ],
-    'BxRoiTraffic': ['station_id', 'roi_id', 'date'],
-    'BxDevice': ['station_id', 'device_id'],
-    'BxContrast': ['station_id', 'contrast_id'],
-    'BxEverydayData': ['station_id', 'date'],
-    'BxEverydayContrastData': ['brand_id', 'name', 'grade'],
-    'BxText': ['brand_id', 'dashboard_id',],
-    'BxPerformArrange': ['station_id', 'station_name', 'start_time', 'end_time'],
-}
+created_ok = []
+
+SHEET_TO_TABLE = settings.SHEET_TO_TABLE
+HEADER_LINE = settings.HEADER_LINE
+START_LINE = settings.START_LINE
+EXCEL_EXPORT_PATH = settings.EXCEL_EXPORT_PATH
+UNIQUE = settings.UNIQUE
 
 
 class Read_sheet(views.View):
@@ -77,26 +45,27 @@ class Read_sheet(views.View):
                     sheet_list = xlsx_obj.read_sheet()  # 取到所有sheet名
                     ret = {'code': 1, 'msg': sheet_list}
                 else:
-                    ret = {'code': 0, 'msg': [{'文件错误': ['请传入正确文件']}]}
+                    ret = {'code': 0, 'msg': [{'文件错误': ['请传入正确文件']}], 'last_url': '/import_excel'}
             else:
-                ret = {'code': 0, 'msg': [{'文件错误': ['文件为空']}]}
+                ret = {'code': 0, 'msg': [{'文件错误': ['文件为空']}], 'last_url': '/import_excel'}
             return render(request, 'import_excel.html', {'ret': ret})
         except Exception as e:
             logging.error(e)
-            return render(request, 'import_excel.html', {'ret': {'code': 0, 'msg': [{'服务器错误': ['服务器发生了未知的错误']}]}})
-
+            return render(request, 'import_excel.html',
+                          {'ret': {'code': 0, 'msg': [{'服务器错误': ['服务器发生了未知的错误']}]}, 'last_url': '/import_excel'})
 
 
 class Save_xlsx(views.View):
     
     def get(self, request):
-        ...
+        redirect('/')
     
     def post(self, request):
+        error_msg = []
         try:
-            error_msg = []
             sheet_name = request.POST.getlist('sheet_name')  # 取到要保存的sheet名
-            print('sheet_name: ', sheet_name)
+            
+            # print('sheet_name: ', sheet_name)
             t_list = []
             for i in sheet_name:
                 xlsx_iter = xlsx_obj.read_data(i)
@@ -111,9 +80,10 @@ class Save_xlsx(views.View):
             return render(request, 'save_excel.html', {'error_msg': error_msg})
         except Exception as e:
             logging.ERROR(e)
-            redirect('/')
+            return render(request, 'save_excel.html', {'error_msg': error_msg})
 
 
+# 此类只是为了获取线程的返回值
 class GetThreadRet(Thread):
     def __init__(self, func, args=()):
         super(GetThreadRet, self).__init__()
@@ -161,7 +131,7 @@ class Operation_xlsx:
             data = sheet.row_values(i)
             for index, cell_type_num in enumerate(row_type, 0):
                 if cell_type_num == 3:  # 将Excel时间类型转化为datetime类型
-                    data[index] = datetime(*xldate_as_tuple(sheet.row_values(i)[index], 0))
+                    data[index] = datetime.datetime(*xldate_as_tuple(sheet.row_values(i)[index], 0))
                 elif cell_type_num == 2:  # 找到number类型,转化为int类型
                     data[index] = int(sheet.row_values(i)[index])
             yield_data = {'sheet_name': sheet.name, 'line_num': i + 1, 'content': data}
@@ -236,10 +206,70 @@ class Operation_xlsx:
                             ret['msg'].append({'{}页 第{}行,{}'.format(sheet_name, line_num, error_data, ): error_msg})
                 if ret['msg']:
                     ret['code'] = 0
+                    created_ok.pop(sheet_name)
                     raise ValueError('表格出现异常,执行回滚')
+        except ValueError as ve:
+            logging.info(ve)
         except Exception as e:
+            ret['msg'].append({sheet_name: ['表格格式错误', ]})
             logging.error(e)
-            ret['msg'].append({sheet_name: ['表格格式错误',]})
-            # raise e
             
+            # raise e
+        
         return ret
+
+
+class Excel_export(views.View):
+    
+    def get(self, request):
+        sheet_name = request.GET.get('sheet_name')
+        ret = {'code': None, 'sheet_name_list': []}
+        if not sheet_name:
+            for i in dir(models):
+                if i.startswith('Bx'):
+                    model = getattr(models, i)
+                    obj = model.objects.first()
+                    if obj:
+                        ret['sheet_name_list'].append(obj._meta.verbose_name)
+                        ret['last_url'] = '/'
+        else:
+            try:
+                workbook = xlwt.Workbook(encoding='utf-8')
+                sheet = workbook.add_sheet(sheet_name, cell_overwrite_ok=True)
+                model_name = SHEET_TO_TABLE[sheet_name][0]
+                model = getattr(models, model_name)
+                
+                field = model.objects.first()
+                if field:
+                    field = field._meta.fields  # 取到模型的所有字段
+                
+                # 构建要保存的数据格式,第一个为所有字段组成的列表,作为excel的表头
+                DATA = [[i.name for i in field], ]
+                
+                query_set = model.objects.values_list(
+                )
+                style = xlwt.XFStyle()
+                for i in query_set:
+                    DATA.append(i)
+                for i, row in enumerate(DATA):
+                    for j, col in enumerate(row):
+                        if isinstance(col, datetime.datetime):  # 转换datetime格式
+                            style.num_format_str = 'YY/MM/DD h:mm:ss'
+                            col = col.replace(tzinfo=None)
+                            sheet.write(i, j, col, style)
+                        elif isinstance(col, datetime.date):  # 转换date格式
+                            style.num_format_str = 'YY/MM/DD '
+                            sheet.write(i, j, col, style)
+                        else:
+                            sheet.write(i, j, col, )
+                workbook.save('{}/{}.xls'.format(EXCEL_EXPORT_PATH, sheet_name))
+                ret['code'] = 1
+            except Exception as e:
+                ret['code'] = 0
+                logging.error(e)
+        return render(request, 'export_excel.html', {'ret': ret})
+
+
+class Index(views.View):
+    def get(self, request):
+        return render(request, 'index.html')

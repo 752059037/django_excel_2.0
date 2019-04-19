@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">导出表格</h3>
+        </div>
+        <div class="panel-body">
+            {% if not ret.code %}
+                <table class="table table-hover table-bordered text-center">
+                    <tr>
+                        <th class="text-center">表名</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                    {% for sheet_name in ret.sheet_name_list %}
+                        <tr>
+                            <td>
+                                {{ sheet_name }}
+                            </td>
+                            <td><a class="btn btn-info btn-sm"
+                                   href="/export_excel/?sheet_name={{ sheet_name }}&{{ next_url }}">导出</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% elif ret.code == 1 %}
+                <div class="center-block text-center"><h1>导出成功</h1></div>
+            {% elif ret.code == 0 %}
+                <div class="center-block text-center"><h1>导出失败</h1></div>
+            {% endif %}
+            <a href="{{ ret.last_url|default:'/export_excel' }}"
+               id="return_key"
+               class="retreat btn btn-success center-block text-center">返回</a>
+        </div>
+    </div>
+
+{% endblock %}
